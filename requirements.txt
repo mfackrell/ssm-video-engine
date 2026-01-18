@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+diffusers==0.27.2
+accelerate
+transformers
+opencv-python
+google-cloud-storage
+pillow
+safetensors
