@@ -1,4 +1,5 @@
-FROM us-docker.pkg.dev/deeplearning-platform-release/gcr.io/pytorch-gpu.2-4.py311.m124
+FROM us-docker.pkg.dev/deeplearning-platform-release/gcr.io/pytorch-gpu.2-4.py310
+
 WORKDIR /app
 
 # Cache models inside the image
