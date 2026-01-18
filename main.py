@@ -18,7 +18,7 @@ sdxl_pipe = DiffusionPipeline.from_pretrained(
 ).to("cuda")
 
 svd_pipe = StableVideoDiffusionPipeline.from_pretrained(
-    "stabilityai/stable-video-diffusion-img1-5-pruned",
+    "stabilityai/stable-video-diffusion-img1-5",
     torch_dtype=torch.float16,
     variant="fp16"
 ).to("cuda")
