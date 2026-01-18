@@ -26,9 +26,14 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Pre-download models (Fixed syntax)
+ARG HF_TOKEN
+
 RUN python -c "from diffusers import DiffusionPipeline, StableVideoDiffusionPipeline; \
     DiffusionPipeline.from_pretrained('stabilityai/sdxl-turbo'); \
-    StableVideoDiffusionPipeline.from_pretrained('stabilityai/stable-video-diffusion-img1-5-pruned')"
+    StableVideoDiffusionPipeline.from_pretrained( \
+        'stabilityai/stable-video-diffusion-img1-5', \
+        use_auth_token='$HF_TOKEN' \
+    )"
 
 COPY . .
 
