@@ -1,18 +1,25 @@
-FROM us-docker.pkg.dev/deeplearning-platform-release/gcr.io/pytorch-gpu.2-4.py311
+FROM python:3.11-slim
 
+# Install system dependencies (ffmpeg + basics)
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
 WORKDIR /app
 
-# Stable HuggingFace cache location
-ENV HF_HOME=/models
+# Copy code
+COPY main.py .
 
-# System dependencies for FFmpeg processing
-RUN apt-get update && apt-get install -y ffmpeg libsm6 libxext6 && rm -rf /var/lib/apt/lists/*
-
-# Install pinned Python libraries
+# Install Python deps (add later as needed)
 RUN pip install --no-cache-dir \
-    fastapi uvicorn diffusers==0.27.2 accelerate transformers \
-    opencv-python google-cloud-storage pillow safetensors
+    google-cloud-storage \
+    flask
 
-# Pre-download SDXL Turbo + Stable Video Diffusion during build
-RUN python -c "from diffusers import DiffusionPipeline, StableVideoDiffusionPipeline; \
-    DiffusionPipeline.from_pretrained('stabilityai/sdxl-turbo', torch_d
+# Cloud Run uses PORT
+ENV PORT=8080
+
+# Start the app
+CMD ["python", "main.py"]
