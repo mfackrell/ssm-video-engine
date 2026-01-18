@@ -25,16 +25,11 @@ RUN curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-stati
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Pre-download models (MANDATORY)
-RUN python - <<EOF
-from diffusers import DiffusionPipeline, StableVideoDiffusionPipeline
-DiffusionPipeline.from_pretrained("stabilityai/sdxl-turbo", torch_dtype="auto")
-StableVideoDiffusionPipeline.from_pretrained(
-    "stabilityai/stable-video-diffusion-img1-5-pruned", torch_dtype="auto"
-)
-EOF
+# Pre-download models (Fixed syntax)
+RUN python -c "from diffusers import DiffusionPipeline, StableVideoDiffusionPipeline; \
+DiffusionPipeline.from_pretrained('stabilityai/sdxl-turbo', torch_dtype='auto'); \
+StableVideoDiffusionPipeline.from_pretrained('stabilityai/stable-video-diffusion-img1-5-pruned', torch_dtype='auto')"
 
 COPY . .
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
-
