@@ -27,8 +27,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Pre-download models (Fixed syntax)
 RUN python -c "from diffusers import DiffusionPipeline, StableVideoDiffusionPipeline; \
-DiffusionPipeline.from_pretrained('stabilityai/sdxl-turbo', torch_dtype='auto'); \
-StableVideoDiffusionPipeline.from_pretrained('stabilityai/stable-video-diffusion-img1-5-pruned', torch_dtype='auto')"
+    DiffusionPipeline.from_pretrained('stabilityai/sdxl-turbo'); \
+    StableVideoDiffusionPipeline.from_pretrained('stabilityai/stable-video-diffusion-img1-5-pruned')"
 
 COPY . .
 
