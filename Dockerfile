@@ -1,25 +1,23 @@
 FROM python:3.11-slim
 
-# Install system dependencies (ffmpeg + basics)
+# Install only essentials
 RUN apt-get update && apt-get install -y \
-    ffmpeg \
     curl \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# Install static ffmpeg
+RUN curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz \
+    | tar -xJ \
+    && mv ffmpeg-*/ffmpeg /usr/local/bin/ffmpeg \
+    && mv ffmpeg-*/ffprobe /usr/local/bin/ffprobe \
+    && rm -rf ffmpeg-*
+
+# Verify
+RUN ffmpeg -version
+
 WORKDIR /app
+COPY . .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy code
-COPY main.py .
-
-# Install Python deps (add later as needed)
-RUN pip install --no-cache-dir \
-    google-cloud-storage \
-    flask
-
-# Cloud Run uses PORT
-ENV PORT=8080
-
-# Start the app
 CMD ["python", "main.py"]
