@@ -4,6 +4,8 @@ import base64
 import requests
 from functions_framework import http
 from google.cloud import storage
+import uuid
+
 
 # Environment variables from your console
 RUNPOD_API_KEY = os.environ.get("RUNPOD_API_KEY")
@@ -59,7 +61,10 @@ def sdxl_manager(request):
         client = storage.Client()
         bucket = client.bucket(BUCKET_NAME)
         
-        filename = f"generated/{prompt[:15].strip().replace(' ', '_')}.png"
+        safe_name = prompt[:15].strip().replace(" ", "_")
+        unique_id = uuid.uuid4().hex[:8]
+        filename = f"generated/{safe_name}_{unique_id}.png"
+        
         blob = bucket.blob(filename)
         blob.upload_from_string(image_data, content_type="image/png")
 
