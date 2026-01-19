@@ -13,7 +13,7 @@ BUCKET_NAME = os.environ.get("GCS_BUCKET_NAME")
 @http
 def sdxl_manager(request):
     request_json = request.get_json(silent=True) or {}
-    prompt = request_json.get("prompt", "cinematic portrait, woman emerging from the ocean a quiet beach at mid day wearning a white bikini, film grain, 85mm lens, bright daylight tones")
+    prompt = request_json.get("prompt", "a beach scene at twilight with footsteps on the sand, sun setting")
 
     headers = {
         "Authorization": f"Bearer {RUNPOD_API_KEY}",
