@@ -10,36 +10,31 @@ RUNPOD_ENDPOINT_ID = os.environ.get("RUNPOD_ENDPOINT_ID")
 BUCKET_NAME = os.environ.get("GCS_BUCKET_NAME")
 
 @functions_framework.http
-def generate_and_save(request):
+def sdxl_manager(request):
     request_json = request.get_json(silent=True)
-    prompt = request_json.get('prompt', 'A futuristic city at sunset')
+    prompt = request_json.get('prompt', 'A high-end fractional CFO office')
     
-    # 1. Call RunPod SDXL API
-    url = f"https://api.runpod.ai/v2/{RUNPOD_ENDPOINT_ID}/runsync"
+    # 1. Call RunPod (Sync mode)
+    url = f"https://api.runpod.ai/v2/{ENDPOINT_ID}/runsync"
     headers = {
         "Authorization": f"Bearer {RUNPOD_API_KEY}",
         "Content-Type": "application/json"
     }
-    payload = {
-        "input": {
-            "prompt": prompt,
-            "width": 1024,
-            "height": 1024
-        }
-    }
+    payload = {"input": {"prompt": prompt, "num_inference_steps": 4}}
     
     response = requests.post(url, headers=headers, json=payload)
     result = response.json()
     
-    # RunPod returns the image as a base64 string
-    image_base64 = result['output'] # Adjust key based on specific template
+    # 2. Extract and Save Image
+    # Note: SDXL-Turbo returns a list of images in base64
+    image_base64 = result['output'][0] 
     image_data = base64.b64decode(image_base64)
 
-    # 2. Save to Google Cloud Storage
     client = storage.Client()
     bucket = client.bucket(BUCKET_NAME)
-    blob = bucket.blob(f"generated_images/{prompt.replace(' ', '_')[:20]}.png")
+    filename = f"generated/{prompt[:15].replace(' ', '_')}.png"
+    blob = bucket.blob(filename)
     
     blob.upload_from_string(image_data, content_type="image/png")
 
-    return f"Image saved to gs://{BUCKET_NAME}/{blob.name}", 200
+    return f"Success! Image saved to: gs://{BUCKET_NAME}/{filename}", 200
