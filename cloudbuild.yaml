@@ -1,20 +1,15 @@
 steps:
-- name: 'gcr.io/cloud-builders/docker'
+- name: gcr.io/cloud-builders/docker
   args:
-    [
-      'build',
-      '--build-arg',
-      'HF_TOKEN=$$HF_TOKEN',
-      '-t',
-      'us-central1-docker.pkg.dev/$PROJECT_ID/ssm/video-engine:latest',
-      '.'
-    ]
-  secretEnv: ['HF_TOKEN']
+    - build
+    - --build-arg
+    - HF_TOKEN=${_HF_TOKEN}
+    - -t
+    - us-central1-docker.pkg.dev/$PROJECT_ID/ssm/video-engine:latest
+    - .
 
 images:
-- 'us-central1-docker.pkg.dev/$PROJECT_ID/ssm/video-engine:latest'
+- us-central1-docker.pkg.dev/$PROJECT_ID/ssm/video-engine:latest
 
-availableSecrets:
-  secretManager:
-  - versionName: projects/$PROJECT_ID/secrets/HF_TOKEN/versions/latest
-    env: HF_TOKEN
+substitutions:
+  _HF_TOKEN: ""
