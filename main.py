@@ -15,8 +15,7 @@ def sdxl_manager(request):
     prompt = request_json.get('prompt', 'A high-end fractional CFO office')
     
     # 1. Call RunPod (Sync mode)
-    url = f"https://api.runpod.ai/v2/{ENDPOINT_ID}/runsync"
-    headers = {
+    url = f"https://api.runpod.ai/v2/{RUNPOD_ENDPOINT_ID}/runsync"    headers = {
         "Authorization": f"Bearer {RUNPOD_API_KEY}",
         "Content-Type": "application/json"
     }
