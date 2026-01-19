@@ -73,14 +73,26 @@ def sdxl_manager(request):
 
             if job_status == "COMPLETED":
                 output = status_result.get("output")
-                if not output or not isinstance(output, list):
+                
+                if not output:
                     return {
                         "status": "error",
                         "message": "RunPod job completed but no output returned",
                         "response": status_result
                     }, 500
+                
+                # RunPod may return a single base64 string OR a list
+                if isinstance(output, list):
+                    image_base64 = output[0]
+                elif isinstance(output, str):
+                    image_base64 = output
+                else:
+                    return {
+                        "status": "error",
+                        "message": "Unexpected RunPod output format",
+                        "response": status_result
+                    }, 500
 
-                image_base64 = output[0]
                 break
 
             if job_status == "FAILED":
