@@ -16,13 +16,14 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 ARG HF_TOKEN
-RUN python - <<EOF
-from diffusers import StableVideoDiffusionPipeline
-StableVideoDiffusionPipeline.from_pretrained(
-  "stabilityai/stable-video-diffusion-img1-5",
-  use_auth_token="$HF_TOKEN"
-)
-EOF
+
+RUN python -c "from diffusers import DiffusionPipeline, StableVideoDiffusionPipeline; \
+    DiffusionPipeline.from_pretrained('stabilityai/sdxl-turbo'); \
+    StableVideoDiffusionPipeline.from_pretrained( \
+        'stabilityai/stable-video-diffusion-img2vid', \
+        torch_dtype='float16' \
+    )"
+
 
 COPY run_svd_frames.py .
 
