@@ -12,6 +12,8 @@ BUCKET_NAME = os.environ.get("GCS_BUCKET_NAME")
 
 @http
 def sdxl_manager(request):
+    print("HANDLER_HIT", time.time())
+
     # --- Validate environment ---
     if not RUNPOD_API_KEY or not RUNPOD_ENDPOINT_ID or not BUCKET_NAME:
         return {
