@@ -110,11 +110,14 @@ def sdxl_manager(request):
         blob = bucket.blob(filename)
         blob.upload_from_string(image_data, content_type="image/png")
 
+        public_url = f"https://storage.googleapis.com/{BUCKET_NAME}/{filename}"
+
         # --- 4. Success ---
         return {
             "status": "success",
             "job_id": job_id,
-            "gcs_path": f"gs://{BUCKET_NAME}/{filename}"
+            "gcs_path": f"gs://{BUCKET_NAME}/{filename}",
+            "public_url": public_url
         }, 200
 
     except Exception as e:
