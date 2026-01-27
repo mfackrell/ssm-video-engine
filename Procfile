@@ -1,1 +1,1 @@
-web: functions-framework --target=svd_video_manager --port=$PORT
+web: functions-framework --target=sdxl_manager --port=$PORT
