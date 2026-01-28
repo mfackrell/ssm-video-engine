@@ -39,8 +39,8 @@ def sdxl_manager(request):
             "input": {
                 "prompt": prompt,
                 "num_inference_steps": 4,
-                "width": 1080,
-                "height": 1920
+                "width": 1024,
+                "height": 1792
             }
         }
 
