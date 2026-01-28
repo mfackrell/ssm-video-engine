@@ -86,7 +86,7 @@ def sdxl_manager(request):
     status_res = requests.get(
         f"https://api.runpod.ai/v2/{RUNPOD_ENDPOINT_ID}/status/{job_id}",
         headers=HEADERS,
-        timeout=30
+        timeout=90
     ).json()
 
     if status_res.get("status") == "FAILED":
