@@ -40,7 +40,7 @@ def sdxl_manager(request):
                 "prompt": prompt,
                 "height": 1024,
                 "width": 1792,
-                "num_inference_steps": 4
+                "num_inference_steps": 25
             }
         }
 
@@ -86,7 +86,7 @@ def sdxl_manager(request):
     status_res = requests.get(
         f"https://api.runpod.ai/v2/{RUNPOD_ENDPOINT_ID}/status/{job_id}",
         headers=HEADERS,
-        timeout=5
+        timeout=30
     ).json()
 
     if status_res.get("status") == "FAILED":
