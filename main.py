@@ -84,7 +84,7 @@ def sdxl_manager(request):
     status_res = requests.get(
         f"https://api.runpod.ai/v2/{RUNPOD_ENDPOINT_ID}/status/{job_id}",
         headers=HEADERS,
-        timeout=90
+        timeout=5
     ).json()
 
     if status_res.get("status") == "FAILED":
@@ -101,32 +101,11 @@ def sdxl_manager(request):
     # =========================
     # PHASE 3 — SAVE IMAGE
     # =========================
-    # =========================
-    # PHASE 3 — SAVE IMAGE
-    # =========================
     images = status_res.get("output", {}).get("images", [])
-    if not images or not isinstance(images, list):
-        return {"status": "pending", "jobId": job_id}, 200
-    
-    first = images[0]
-    
-    # first may be a dict: {"image": "..."} OR a string: "data:image/png;base64,..."
-    if isinstance(first, dict):
-        image_str = first.get("image")
-    elif isinstance(first, str):
-        image_str = first
-    else:
-        return {"status": "pending", "jobId": job_id}, 200
-    
-    if not image_str or not isinstance(image_str, str):
-        return {"status": "pending", "jobId": job_id}, 200
-    
-    # Strip optional data URL prefix
-    if image_str.startswith("data:image"):
-        image_str = image_str.split(",", 1)[1]
-    
-    image_bytes = base64.b64decode(image_str)
+    if not images or "image" not in images[0]:
+        return {"status": "error", "message": "No image in output"}, 500
 
+    image_bytes = base64.b64decode(images[0]["image"])
 
     safe_id = uuid.uuid4().hex[:8]
     filename = f"generated/sdxl_{safe_id}.png"
