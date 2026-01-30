@@ -38,7 +38,9 @@ def sdxl_manager(request):
         payload = {
             "input": {
                 "prompt": prompt,
-                "num_inference_steps": 4
+                "height": 1080,
+                "width": 1920,
+                "num_inference_steps": 25
             }
         }
 
