@@ -38,8 +38,8 @@ def sdxl_manager(request):
         payload = {
             "input": {
                 "prompt": prompt,
-                "height": 1920,
-                "width": 1080,
+                "height": 1792,
+                "width": 1024,
                 "num_inference_steps": 30
             }
         }
@@ -103,7 +103,23 @@ def sdxl_manager(request):
     # =========================
     # PHASE 3 — SAVE IMAGE
     # =========================
-    images = status_res.get("output", {}).get("images")
+    output = status_res.get("output")
+
+    images = None
+    
+    if isinstance(output, dict):
+        images = output.get("images") or output.get("image")
+    elif isinstance(output, list):
+        images = output
+    
+    if not images:
+        return {
+            "status": "error",
+            "message": f"No images in SDXL output. Keys: {list(output.keys()) if isinstance(output, dict) else type(output)}"
+        }, 500
+    
+    if not isinstance(images, list):
+        images = [images]
     
     if not images or not isinstance(images, list):
         return {"status": "error", "message": "No images returned from SDXL"}, 500
