@@ -100,62 +100,62 @@ def sdxl_manager(request):
             "jobId": job_id
         }, 200
 
-# =========================
-# PHASE 3 — SAVE IMAGE
-# =========================
-images = status_res.get("output", {}).get("images")
-
-if not images or not isinstance(images, list):
-    return {"status": "error", "message": "No images returned from SDXL"}, 500
-
-first = images[0]
-
-# Normalize image base64 across repo formats
-if isinstance(first, str):
-    image_b64 = first
-
-elif isinstance(first, dict):
-    image_b64 = (
-        first.get("image") or
-        first.get("b64") or
-        first.get("base64")
-    )
-
-else:
+    # =========================
+    # PHASE 3 — SAVE IMAGE
+    # =========================
+    images = status_res.get("output", {}).get("images")
+    
+    if not images or not isinstance(images, list):
+        return {"status": "error", "message": "No images returned from SDXL"}, 500
+    
+    first = images[0]
+    
+    # Normalize image base64 across repo formats
+    if isinstance(first, str):
+        image_b64 = first
+    
+    elif isinstance(first, dict):
+        image_b64 = (
+            first.get("image") or
+            first.get("b64") or
+            first.get("base64")
+        )
+    
+    else:
+        return {
+            "status": "error",
+            "message": f"Unexpected image type: {type(first)}"
+        }, 500
+    
+    if not image_b64 or not isinstance(image_b64, str):
+        return {
+            "status": "error",
+            "message": "Image base64 missing or invalid"
+        }, 500
+    
+    try:
+        image_bytes = base64.b64decode(image_b64)
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Failed to decode image base64: {str(e)}"
+        }, 500
+    
+    safe_id = uuid.uuid4().hex[:8]
+    filename = f"generated/sdxl_{safe_id}.png"
+    
+    blob = bucket.blob(filename)
+    blob.upload_from_string(image_bytes, content_type="image/png")
+    
+    public_url = f"https://storage.googleapis.com/{BUCKET_NAME}/{filename}"
+    
+    # Persist completion
+    job_state["status"] = "COMPLETE"
+    job_state["public_url"] = public_url
+    job_blob.upload_from_string(json.dumps(job_state))
+    
     return {
-        "status": "error",
-        "message": f"Unexpected image type: {type(first)}"
-    }, 500
-
-if not image_b64 or not isinstance(image_b64, str):
-    return {
-        "status": "error",
-        "message": "Image base64 missing or invalid"
-    }, 500
-
-try:
-    image_bytes = base64.b64decode(image_b64)
-except Exception as e:
-    return {
-        "status": "error",
-        "message": f"Failed to decode image base64: {str(e)}"
-    }, 500
-
-safe_id = uuid.uuid4().hex[:8]
-filename = f"generated/sdxl_{safe_id}.png"
-
-blob = bucket.blob(filename)
-blob.upload_from_string(image_bytes, content_type="image/png")
-
-public_url = f"https://storage.googleapis.com/{BUCKET_NAME}/{filename}"
-
-# Persist completion
-job_state["status"] = "COMPLETE"
-job_state["public_url"] = public_url
-job_blob.upload_from_string(json.dumps(job_state))
-
-return {
-    "status": "success",
-    "public_url": public_url
-}, 200
+        "status": "success",
+        "public_url": public_url
+    }, 200
 
