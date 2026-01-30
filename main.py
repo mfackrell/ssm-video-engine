@@ -149,6 +149,10 @@ def sdxl_manager(request):
             "message": "Image base64 missing or invalid"
         }, 500
     
+    # Strip data URL prefix if present
+    if image_b64.startswith("data:"):
+        image_b64 = image_b64.split(",", 1)[1]
+    
     try:
         image_bytes = base64.b64decode(image_b64)
     except Exception as e:
